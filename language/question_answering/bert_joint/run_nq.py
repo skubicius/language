@@ -65,6 +65,11 @@ flags.DEFINE_string(
     "natural_questions.nq_eval.")
 
 flags.DEFINE_string(
+    "output_prediction_dict_file", None,
+    "Where to print predictions summary dict in NQ prediction format, to be passed to"
+    "natural_questions.nq_eval.")
+
+flags.DEFINE_string(
     "init_checkpoint", None,
     "Initial checkpoint (usually from a pre-trained BERT model).")
 
@@ -1223,7 +1228,8 @@ def compute_predictions(example):
           "end_byte": -1
       }],
       "short_answers_score": score,
-      "yes_no_answer": "NONE"
+      "yes_no_answer": "NONE",
+      'summary': summary
   }
 
   return summary
@@ -1272,7 +1278,7 @@ def compute_pred_dict(candidates_dict, dev_features, raw_results):
       tf.logging.info("Examples processed: %d", len(nq_pred_dict))
   tf.logging.info("Done computing predictions.")
 
-  return nq_pred_dict
+  return nq_pred_dict, summary_dict
 
 
 def validate_flags_or_throw(bert_config):
@@ -1428,11 +1434,15 @@ def main(_):
         tf.train.Example.FromString(r)
         for r in tf.python_io.tf_record_iterator(eval_filename)
     ]
-    nq_pred_dict = compute_pred_dict(candidates_dict, eval_features,
-                                     [r._asdict() for r in all_results])
+    nq_pred_dict, summary_dict = compute_pred_dict(candidates_dict, eval_features,
+                                                   [r._asdict() for r in all_results])
+
     predictions_json = {"predictions": nq_pred_dict.values()}
     with tf.gfile.Open(FLAGS.output_prediction_file, "w") as f:
       json.dump(predictions_json, f, indent=4)
+
+    with tf.gfile.Open(FLAGS.output_prediction_dict_file, "w") as f:
+      json.dump(summary_dict, f, indent=4)
 
 
 if __name__ == "__main__":
