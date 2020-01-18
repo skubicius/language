@@ -1229,7 +1229,8 @@ def compute_predictions(example):
       }],
       "short_answers_score": score,
       "yes_no_answer": "NONE",
-      'summary': summary
+      'answer_type_logits': summary.answer_type_logits,
+      'cls_token_score': summary.cls_token_score
   }
 
   return summary
