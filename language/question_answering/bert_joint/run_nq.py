@@ -1162,7 +1162,7 @@ def get_best_indexes(logits, n_best_size):
 def compute_predictions(example):
   """Converts an example into an NQEval object for evaluation."""
   predictions = []
-  n_best_size = 10
+  n_best_size = 30
   max_answer_length = 30
 
   for unique_id, result in example.results.iteritems():
