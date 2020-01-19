@@ -979,7 +979,7 @@ def model_fn_builder(bert_config, init_checkpoint, learning_rate,
       end_loss = compute_loss(end_logits, end_positions)
       answer_type_loss = compute_label_loss(answer_type_logits, answer_types)
 
-      total_loss = (start_loss + end_loss + answer_type_loss) / 3.0
+      total_loss = (2.0 * (start_loss + end_loss) + answer_type_loss) / 5.0
 
       train_op = optimization.create_optimizer(total_loss, learning_rate,
                                                num_train_steps,
